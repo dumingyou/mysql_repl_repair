@@ -168,4 +168,4 @@ sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/
 ================
 
 * qq: 137727431
-* email: dukope@163.com
+* email: dukope@163.com,tianyuanzhao@126.com
