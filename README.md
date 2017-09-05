@@ -1,5 +1,5 @@
 # mysql_repl_repair
-mysql_repl_repair.py是一款用于修复mysql主从复制错误的python小工具，该工具只能修复由于主从数据不一致导致的1062(duplicate key), 1032(key not found)错误。当遇到复制出错，mysql_repl_repair.py会流式读取relay log中的数据，并构造成修复sql，在从库上执行，解决sql线程apply时遇到的问题。mysql_repl_repair.py非常轻巧，即使在遇到大事务时也不会对服务器造成性能影响，mysql_repl_repair.py支持以daemon方式后台运行，支持单机多实例下同时修复多个实例
+mysql_repl_repair.py是一款用于修复mysql主从复制错误的python小工具，该工具可以修复由于主从数据不一致导致的1062(duplicate key), 1032(key not found)错误。当遇到复制出错，mysql_repl_repair.py会流式读取relay log中的数据，并构造成修复sql，在从库上执行，解决sql线程apply时遇到的问题。mysql_repl_repair.py非常轻巧，即使在遇到大事务时也不会对服务器造成性能影响，mysql_repl_repair.py支持以daemon方式后台运行，支持单机多实例下同时修复多个实例
 
 目前网易内部的使用方法：监控服务定期监控mysql主从复制状态，如遇1062,1032 则执行mysql_repl_repair.py进行修复
 
