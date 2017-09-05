@@ -33,18 +33,20 @@ Options:
   -t TIME, --time=TIME  unit is second, default is 0 mean run forever
   -v, --verbose         debug log mode
   ```
-  
-  特别说明：
-  =========
-  *支持5.1 ~ 5.7，如有版本不支持或者出错，请联系我，我们将进行修复
-  *目前只支持ROW格式binlog且为FULL row image格式
-  *json，空间数据类型的表造成的复制异常目前版本暂不支持，如有需求请提出，我们将考虑支持一下
-  *代码大部分解析binlog的函数代码都是参考https://github.com/noplay/python-mysql-replication，非常感谢python-mysql-replication的作者们的付出
+ 
   
-  
+  特别说明
+================
+
+* 支持5.1 ~ 5.7，如有版本不支持或者出错，请联系我，我们将进行修复
+* 目前只支持ROW格式binlog且为FULL row image格式
+* json，空间数据类型的表造成的复制异常目前版本暂不支持，以上如有需求请提出，我们将考虑支持一下
+* 代码大部分解析binlog的函数代码都是参考https://github.com/noplay/python-mysql-replication，非常感谢python-mysql-replication的作者们的付出
   
-  
-  问题反馈方式：
-  ============
-  *qq: 137727431
-  *email: dukope@163.com
+ 
+
+问题反馈方式
+================
+
+* qq: 137727431
+* email: dukope@163.com
