@@ -154,7 +154,7 @@ sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/
 3.结束：
 如果不是以daemon方式运行，那么只需要Ctrl+C即可结束，如果是以daemon方式，直接kill进程即可
 
-鸣谢
+感谢
 ======
 代码大部分解析binlog的函数代码都是参考https://github.com/noplay/python-mysql-replication
 在此非常感谢python-mysql-replication的作者们的付出
