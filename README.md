@@ -151,8 +151,23 @@ sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/
 ^CBye.Bye
 ```
 
-3.结束：
+3.结束
+
 如果不是以daemon方式运行，那么只需要Ctrl+C即可结束，如果是以daemon方式，直接kill进程即可
+
+Q&A
+======
+1.mysql支持slave_exec_mode=IDEMPOTENT，来跳过复制错误，为啥还要找个工具?
+
+slave_exec_mode为IDEMPOTENT时，从库slave的表现是遇到insert出错时replace，遇到update、delete出错时时跳过，本工具的做法insert与delete与之效果一样，差别在于update, 从库跳过update的话，数据相当于丢失，本工具会先插入update前的数据，复制修复成功后数据不会丢失
+
+2.这个工具支持远程执行吗？
+
+不支持，因为需要读取并解析mysql relay log，所以只能在mysql server本地执行
+
+3.这个工具支持mysql5.7的GTID吗？
+
+支持
 
 感谢
 ======
