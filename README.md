@@ -67,7 +67,7 @@ grant all on *.* to mysql@'localhost' identified by 'mysql';
 2.执行脚本，注意：系统用户需要有读relay log的权限，没有的话用sudo
 ```shell
 非debug日志模式：
-sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysqlmonitor -p mysqlmonitor --socket=/tmp/mysql.sock
+sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql.sock
 [INFO] [2017-09-05 20:18:55,279] [3306] ****************************************************************
 [INFO] [2017-09-05 20:18:55,279] [3306]                          PROCESS START
 [INFO] [2017-09-05 20:18:55,279] [3306] ****************************************************************
