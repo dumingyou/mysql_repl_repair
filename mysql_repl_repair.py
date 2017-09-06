@@ -220,6 +220,18 @@ class MysqlReplRepair(Thread):
 
 		return ret
 
+	def get_relay_dir(self):
+
+		ret = self.execsql("select @@relay_log relay_log")
+		if ret["relay_log"].startswith("/"):
+			return ret["relay_log"][:ret["relay_log"].rindex("/")+1]
+		else:
+			datadir = self.execsql("select @@datadir datadir")["datadir"]
+			if ret["relay_log"].startswith("./"):
+				return datadir + ret["relay_log"][:ret["relay_log"].rindex("/")+1]
+			else:
+				return datadir
+
 	def table_unique_key_info(self,schema_name,table_name):
 		"get table unique key"
 
@@ -339,7 +351,7 @@ class MysqlReplRepair(Thread):
 			sigint_up = True
 			raise Exception("unsupport binlog format")
 
-		datadir = self.execsql("select @@datadir datadir")["datadir"]
+		relaydir = self.get_relay_dir()
 
 		while sigint_up==False:
 			slaveinfo = self.execsql("show slave status")
@@ -355,7 +367,7 @@ class MysqlReplRepair(Thread):
 			self.errorno = int(slaveinfo['Last_SQL_Errno'])
 			if self.errorno in (1032, 1062):
 
-				binlogfile = datadir + slaveinfo["Relay_Log_File"]
+				binlogfile = relaydir + slaveinfo["Relay_Log_File"]
 
 				self.start_position = slaveinfo["Relay_Log_Pos"]
 				last_sql_error = slaveinfo["Last_SQL_Error"]
