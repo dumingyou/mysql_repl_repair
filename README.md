@@ -166,6 +166,6 @@ sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/
 
 问题反馈方式
 ================
-
+* 提issue
 * qq群: 116121252
 * email: dukope@163.com,tianyuanzhao@126.com
