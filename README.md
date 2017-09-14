@@ -67,88 +67,69 @@ grant all on *.* to mysql@'localhost' identified by 'mysql';
 2.执行脚本，注意：系统用户需要有读relay log的权限，没有的话用sudo
 ```shell
 非debug日志模式：
-sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql.sock
-[INFO] [2017-09-05 20:18:55,279] [3306] ****************************************************************
-[INFO] [2017-09-05 20:18:55,279] [3306]                          PROCESS START
-[INFO] [2017-09-05 20:18:55,279] [3306] ****************************************************************
-[INFO] [2017-09-05 20:18:55,280] [3306] ****************************************************************
-[INFO] [2017-09-05 20:18:55,280] [3306]           REPL ERROR FOUND !!! STRAT REPAIR ERROR...
-[INFO] [2017-09-05 20:18:55,280] [3306] ****************************************************************
-[INFO] [2017-09-05 20:18:55,281] [3306] RELAYLOG FILE : /ebs/mysql_data/mysqld-relay-bin.000072 
-[INFO] [2017-09-05 20:18:55,281] [3306] START POSITION : 259863 . STOP POSITION : 260223 
-[INFO] [2017-09-05 20:18:55,281] [3306] ERROR MESSAGE : Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000008, end_log_pos 1000074349
-[INFO] [2017-09-05 20:18:55,281] [3306] start parse relay log to fix this error...
-[INFO] [2017-09-05 20:18:55,283] [3306] try to run this sql to resolve repl error, sql: insert ignore into `dmy2`.`mytest` set `a` = 101,`c` = 121,`b` = 10,`e` = x'746467736467',`d` = 5,`g` = x'6433797a736166',`f` = x'3433357479',`i` = '10:10:10.11',`h` = 10.22200,`k` = from_unixtime(1504612739.149),`j` = '1999-1-1',`m` = '1990',`l` = 555,`o` = 3,`n` = 1,`y` = 10.1999998093,`x` = 101.12
-[INFO] [2017-09-05 20:18:55,388] [3306] slave repl error fixed success!
-[INFO] [2017-09-05 20:18:57,390] [3306] SLAVE IS OK !, SKIP...
-[INFO] [2017-09-05 20:18:59,393] [3306] SLAVE IS OK !, SKIP...
+sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysqlmonitor -p mysqlmonitor --socket=/tmp/mysql.sock
+[INFO] [2017-09-14 12:49:31,792] [3306] ****************************************************************
+[INFO] [2017-09-14 12:49:31,792] [3306]                          PROCESS START
+[INFO] [2017-09-14 12:49:31,792] [3306] ****************************************************************
+[INFO] [2017-09-14 12:50:21,851] [3306] SLAVE IS OK !, SKIP...
+[INFO] [2017-09-14 12:50:23,853] [3306] ****************************************************************
+[INFO] [2017-09-14 12:50:23,853] [3306]           REPL ERROR FOUND !!! STRAT REPAIR ERROR...
+[INFO] [2017-09-14 12:50:23,853] [3306] ****************************************************************
+[INFO] [2017-09-14 12:50:23,853] [3306] RELAYLOG FILE : /ebs/mysql_data/mysqld-relay-bin.000075 
+[INFO] [2017-09-14 12:50:23,853] [3306] START POSITION : 94820032 . STOP POSITION : 94820392 
+[INFO] [2017-09-14 12:50:23,853] [3306] ERROR MESSAGE : Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000009, end_log_pos 94820228
+[INFO] [2017-09-14 12:50:23,853] [3306] start parse relay log to fix this error...
+[INFO] [2017-09-14 12:50:23,856] [3306] try to run this sql to resolve repl error, sql: insert ignore into `dmy2`.`mytest` set `a` = 101,`c` = 121,`b` = 10,`e` = x'746467736467',`d` = 51,`g` = x'6433797a736166',`f` = x'3433357479',`i` = '10:10:10.11',`h` = 10.22200,`k` = from_unixtime(1504613928.710),`j` = '1999-1-1',`m` = '1990',`l` = 555,`o` = 3,`n` = 1,`y` = 10.1999998093,`x` = 101.12
+[INFO] [2017-09-14 12:50:23,962] [3306] slave repl error fixed success!
+[INFO] [2017-09-14 12:50:25,964] [3306] SLAVE IS OK !, SKIP...
+[INFO] [2017-09-14 12:50:27,967] [3306] SLAVE IS OK !, SKIP...
+^CBye.Bye
 
 开启debug日志：
 sudo python /tmp/mysqlmon//mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql3306.sock -v
-[INFO] [2017-09-05 19:59:28,386] [3306] ****************************************************************
-[INFO] [2017-09-05 19:59:28,386] [3306]                          PROCESS START
-[INFO] [2017-09-05 19:59:28,386] [3306] ****************************************************************
-[DEBUG] [2017-09-05 19:59:28,386] [3306] get file lock on /tmp/mysql_repl_repair3306.lck success
-[DEBUG] [2017-09-05 19:59:28,387] [3306] start run sql: select @@datadir datadir
-[DEBUG] [2017-09-05 19:59:28,387] [3306] sql result: {'datadir': '/ebs/mysql_data/'}
-[DEBUG] [2017-09-05 19:59:28,387] [3306] start run sql: show slave status
-[DEBUG] [2017-09-05 19:59:28,387] [3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': "Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000008, end_log_pos 999807692", 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': None, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000008', 'Read_Master_Log_Pos': 999814411L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 999807332L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 3687797L, 'Last_SQL_Error': "Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000008, end_log_pos 999807692", 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000008', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '170905 19:58:59', 'Relay_Log_File': 'mysqld-relay-bin.000071', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': '', 'Replicate_Do_Table': '', 'Last_Errno': 1032L, 'Master_Host': '10.171.160.9', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'No', 'Relay_Log_Pos': 3667190L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 1032L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
-[INFO] [2017-09-05 19:59:28,387] [3306] ****************************************************************
-[INFO] [2017-09-05 19:59:28,387] [3306]           REPL ERROR FOUND !!! STRAT REPAIR ERROR...
-[INFO] [2017-09-05 19:59:28,387] [3306] ****************************************************************
-[INFO] [2017-09-05 19:59:28,387] [3306] RELAYLOG FILE : /ebs/mysql_data/mysqld-relay-bin.000071 
-[INFO] [2017-09-05 19:59:28,387] [3306] START POSITION : 3667190 . STOP POSITION : 3667550 
-[INFO] [2017-09-05 19:59:28,387] [3306] ERROR MESSAGE : Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000008, end_log_pos 999807692
-[INFO] [2017-09-05 19:59:28,387] [3306] start parse relay log to fix this error...
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: a, data type: int, read bytes 4, column value: 101
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: b, data type: smallint, read bytes 2, column value: 10
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: c, data type: int, read bytes 4, column value: 121
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: d, data type: mediumint, read bytes 3, column value: 1110111
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: y, data type: float, read bytes 4, column value: 10.1999998093
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: x, data type: double, read bytes 8, column value: 101.12
-[DEBUG] [2017-09-05 19:59:28,389] [3306] read column for dmy2.mytest, column: e, data type: varchar, read bytes 8, column value: x'746467736467'
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: f, data type: char, read bytes 6, column value: x'3433357479'
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: g, data type: text, read bytes 9, column value: x'6433797a736166'
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: h, data type: decimal, read bytes 6, column value: 10.22200
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: i, data type: time, read bytes 4, column value: '10:10:10.11'
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: j, data type: date, read bytes 3, column value: '1999-1-1'
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: k, data type: timestamp, read bytes 6, column value: from_unixtime(1504239488.348)
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: l, data type: bigint, read bytes 8, column value: 555
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: m, data type: year, read bytes 1, column value: '1990'
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: n, data type: enum, read bytes 1, column value: 1
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: o, data type: set, read bytes 1, column value: 3
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: a, data type: int, read bytes 4, column value: 101
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: b, data type: smallint, read bytes 2, column value: 10
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: c, data type: int, read bytes 4, column value: 121
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: d, data type: mediumint, read bytes 3, column value: 5
-[DEBUG] [2017-09-05 19:59:28,390] [3306] read column for dmy2.mytest, column: y, data type: float, read bytes 4, column value: 10.1999998093
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: x, data type: double, read bytes 8, column value: 101.12
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: e, data type: varchar, read bytes 8, column value: x'746467736467'
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: f, data type: char, read bytes 6, column value: x'3433357479'
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: g, data type: text, read bytes 9, column value: x'6433797a736166'
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: h, data type: decimal, read bytes 6, column value: 10.22200
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: i, data type: time, read bytes 4, column value: '10:10:10.11'
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: j, data type: date, read bytes 3, column value: '1999-1-1'
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: k, data type: timestamp, read bytes 6, column value: from_unixtime(1504612739.149)
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: l, data type: bigint, read bytes 8, column value: 555
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: m, data type: year, read bytes 1, column value: '1990'
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: n, data type: enum, read bytes 1, column value: 1
-[DEBUG] [2017-09-05 19:59:28,391] [3306] read column for dmy2.mytest, column: o, data type: set, read bytes 1, column value: 3
-[DEBUG] [2017-09-05 19:59:28,391] [3306] filename: /ebs/mysql_data/mysqld-relay-bin.000071,start_pos: 3667546,rowdata: {'table_name': 'mytest', 'table_schema': 'dmy2', 'data': {'a': 101, 'c': 121, 'b': 10, 'e': "x'746467736467'", 'd': 1110111, 'g': "x'6433797a736166'", 'f': "x'3433357479'", 'i': "'10:10:10.11'", 'h': Decimal('10.22200'), 'k': 'from_unixtime(1504239488.348)', 'j': "'1999-1-1'", 'm': "'1990'", 'l': 555, 'o': 3, 'n': 1, 'y': 10.199999809265137, 'x': 101.12}, 'event_type': 31, 'data2': {'a': 101, 'c': 121, 'b': 10, 'e': "x'746467736467'", 'd': 5, 'g': "x'6433797a736166'", 'f': "x'3433357479'", 'i': "'10:10:10.11'", 'h': Decimal('10.22200'), 'k': 'from_unixtime(1504612739.149)', 'j': "'1999-1-1'", 'm': "'1990'", 'l': 555, 'o': 3, 'n': 1, 'y': 10.199999809265137, 'x': 101.12}}
-[INFO] [2017-09-05 19:59:28,392] [3306] try to run this sql to resolve repl error, sql: insert ignore into `dmy2`.`mytest` set `a` = 101,`c` = 121,`b` = 10,`e` = x'746467736467',`d` = 1110111,`g` = x'6433797a736166',`f` = x'3433357479',`i` = '10:10:10.11',`h` = 10.22200,`k` = from_unixtime(1504239488.348),`j` = '1999-1-1',`m` = '1990',`l` = 555,`o` = 3,`n` = 1,`y` = 10.1999998093,`x` = 101.12
-[DEBUG] [2017-09-05 19:59:28,392] [3306] start run sql: insert ignore into `dmy2`.`mytest` set `a` = 101,`c` = 121,`b` = 10,`e` = x'746467736467',`d` = 1110111,`g` = x'6433797a736166',`f` = x'3433357479',`i` = '10:10:10.11',`h` = 10.22200,`k` = from_unixtime(1504239488.348),`j` = '1999-1-1',`m` = '1990',`l` = 555,`o` = 3,`n` = 1,`y` = 10.1999998093,`x` = 101.12
-[DEBUG] [2017-09-05 19:59:28,393] [3306] sql result: None
-[DEBUG] [2017-09-05 19:59:28,393] [3306] start run sql: stop slave;
-[DEBUG] [2017-09-05 19:59:28,429] [3306] sql result: None
-[DEBUG] [2017-09-05 19:59:28,429] [3306] start run sql: start slave
-[DEBUG] [2017-09-05 19:59:28,445] [3306] sql result: None
-[DEBUG] [2017-09-05 19:59:28,545] [3306] start run sql: show slave status
-[DEBUG] [2017-09-05 19:59:28,553] [3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': '', 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': 24L, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000008', 'Read_Master_Log_Pos': 999814411L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 999809186L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 3688136L, 'Last_SQL_Error': '', 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000008', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '', 'Relay_Log_File': 'mysqld-relay-bin.000071', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': 'System lock', 'Replicate_Do_Table': '', 'Last_Errno': 0L, 'Master_Host': '10.171.160.9', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'Yes', 'Relay_Log_Pos': 3669044L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 0L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
-[INFO] [2017-09-05 19:59:28,553] [3306] slave repl error fixed success!
-[DEBUG] [2017-09-05 19:59:30,555] [3306] start run sql: show slave status
-[DEBUG] [2017-09-05 19:59:30,556] [3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': '', 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': 0L, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000008', 'Read_Master_Log_Pos': 999814829L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 999814829L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 3675026L, 'Last_SQL_Error': '', 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000008', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '', 'Relay_Log_File': 'mysqld-relay-bin.000072', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': 'Slave has read all relay log; waiting for the slave I/O thread to update it', 'Replicate_Do_Table': '', 'Last_Errno': 0L, 'Master_Host': '10.171.160.9', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'Yes', 'Relay_Log_Pos': 703L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 0L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
-[INFO] [2017-09-05 19:59:30,556] [3306] SLAVE IS OK !, SKIP...
-^CBye.Bye
+[INFO] [2017-09-14 12:51:37,191] [3306] ****************************************************************
+[INFO] [2017-09-14 12:51:37,191] [3306]                          PROCESS START
+[INFO] [2017-09-14 12:51:37,191] [3306] ****************************************************************
+[DEBUG] [2017-09-14 12:51:37,191] [3306] get file lock on /tmp/mysql_repl_repair3306.lck success
+[DEBUG] [2017-09-14 12:51:37,191] [3306] start run sql: select @@datadir datadir
+[DEBUG] [2017-09-14 12:51:37,192] [3306] sql result: {'datadir': '/ebs/mysql_data/'}
+[DEBUG] [2017-09-14 12:51:37,192] [3306] start run sql: show slave status
+[DEBUG] [2017-09-14 12:51:37,192] [3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': "Could not execute Write_rows event on table dmy2.mytest; Duplicate entry '10-11' for key 'uk_bc', Error_code: 1062; handler error HA_ERR_FOUND_DUPP_KEY; the event's master log mysql-bin.000009, end_log_pos 94836423", 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': None, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000009', 'Read_Master_Log_Pos': 94837081L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 94836143L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 94837584L, 'Last_SQL_Error': "Could not execute Write_rows event on table dmy2.mytest; Duplicate entry '10-11' for key 'uk_bc', Error_code: 1062; handler error HA_ERR_FOUND_DUPP_KEY; the event's master log mysql-bin.000009, end_log_pos 94836423", 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000009', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '170914 12:51:34', 'Relay_Log_File': 'mysqld-relay-bin.000076', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': '', 'Replicate_Do_Table': '', 'Last_Errno': 1062L, 'Master_Host': '10.171.160.9', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'No', 'Relay_Log_Pos': 15960L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 1062L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
+[INFO] [2017-09-14 12:51:37,192] [3306] ****************************************************************
+[INFO] [2017-09-14 12:51:37,192] [3306]           REPL ERROR FOUND !!! STRAT REPAIR ERROR...
+[INFO] [2017-09-14 12:51:37,193] [3306] ****************************************************************
+[INFO] [2017-09-14 12:51:37,193] [3306] RELAYLOG FILE : /ebs/mysql_data/mysqld-relay-bin.000076 
+[INFO] [2017-09-14 12:51:37,193] [3306] START POSITION : 15960 . STOP POSITION : 16240 
+[INFO] [2017-09-14 12:51:37,193] [3306] ERROR MESSAGE : Could not execute Write_rows event on table dmy2.mytest; Duplicate entry '10-11' for key 'uk_bc', Error_code: 1062; handler error HA_ERR_FOUND_DUPP_KEY; the event's master log mysql-bin.000009, end_log_pos 94836423
+[INFO] [2017-09-14 12:51:37,193] [3306] start parse relay log to fix this error...
+[DEBUG] [2017-09-14 12:51:37,195] [3306] read column for dmy2.mytest, column: a, data type: int, read bytes 4, column value: 100
+[DEBUG] [2017-09-14 12:51:37,195] [3306] read column for dmy2.mytest, column: b, data type: smallint, read bytes 2, column value: 10
+[DEBUG] [2017-09-14 12:51:37,195] [3306] read column for dmy2.mytest, column: c, data type: int, read bytes 4, column value: 11
+[DEBUG] [2017-09-14 12:51:37,195] [3306] read column for dmy2.mytest, column: d, data type: mediumint, read bytes 3, column value: 10
+[DEBUG] [2017-09-14 12:51:37,195] [3306] read column for dmy2.mytest, column: y, data type: float, read bytes 4, column value: 10.1999998093
+[DEBUG] [2017-09-14 12:51:37,195] [3306] read column for dmy2.mytest, column: x, data type: double, read bytes 8, column value: 10.1
+[DEBUG] [2017-09-14 12:51:37,196] [3306] read column for dmy2.mytest, column: e, data type: varchar, read bytes 8, column value: x'746467736467'
+[DEBUG] [2017-09-14 12:51:37,196] [3306] read column for dmy2.mytest, column: f, data type: char, read bytes 6, column value: x'3433357479'
+[DEBUG] [2017-09-14 12:51:37,196] [3306] read column for dmy2.mytest, column: g, data type: text, read bytes 9, column value: x'6433797a736166'
+[DEBUG] [2017-09-14 12:51:37,196] [3306] read column for dmy2.mytest, column: h, data type: decimal, read bytes 6, column value: 10.22200
+[DEBUG] [2017-09-14 12:51:37,196] [3306] read column for dmy2.mytest, column: i, data type: time, read bytes 4, column value: '10:10:10.11'
+[DEBUG] [2017-09-14 12:51:37,197] [3306] read column for dmy2.mytest, column: j, data type: date, read bytes 3, column value: '1999-1-1'
+[DEBUG] [2017-09-14 12:51:37,197] [3306] read column for dmy2.mytest, column: k, data type: timestamp, read bytes 6, column value: from_unixtime(1504235903.086)
+[DEBUG] [2017-09-14 12:51:37,197] [3306] read column for dmy2.mytest, column: l, data type: bigint, read bytes 8, column value: 555
+[DEBUG] [2017-09-14 12:51:37,197] [3306] read column for dmy2.mytest, column: m, data type: year, read bytes 1, column value: '1990'
+[DEBUG] [2017-09-14 12:51:37,198] [3306] read column for dmy2.mytest, column: n, data type: enum, read bytes 1, column value: 1
+[DEBUG] [2017-09-14 12:51:37,198] [3306] read column for dmy2.mytest, column: o, data type: set, read bytes 1, column value: 3
+[DEBUG] [2017-09-14 12:51:37,198] [3306] filename: /ebs/mysql_data/mysqld-relay-bin.000076,start_pos: 16236,rowdata: {'table_name': 'mytest', 'table_schema': 'dmy2', 'data': {'a': 100, 'c': 11, 'b': 10, 'e': "x'746467736467'", 'd': 10, 'g': "x'6433797a736166'", 'f': "x'3433357479'", 'i': "'10:10:10.11'", 'h': Decimal('10.22200'), 'k': 'from_unixtime(1504235903.086)', 'j': "'1999-1-1'", 'm': "'1990'", 'l': 555, 'o': 3, 'n': 1, 'y': 10.199999809265137, 'x': 10.1}, 'event_type': 30, 'data2': {}}
+[INFO] [2017-09-14 12:51:37,198] [3306] try to run this sql to resolve repl error, sql: delete from `dmy2`.`mytest` where  ( `a` = 100 ) or ( `b` = 10 and `c` = 11 ) 
+[DEBUG] [2017-09-14 12:51:37,199] [3306] start run sql: delete from `dmy2`.`mytest` where  ( `a` = 100 ) or ( `b` = 10 and `c` = 11 ) 
+[DEBUG] [2017-09-14 12:51:37,200] [3306] sql result: None
+[DEBUG] [2017-09-14 12:51:37,200] [3306] start run sql: stop slave;
+[DEBUG] [2017-09-14 12:51:37,202] [3306] sql result: None
+[DEBUG] [2017-09-14 12:51:37,202] [3306] start run sql: start slave
+[DEBUG] [2017-09-14 12:51:37,205] [3306] sql result: None
+[DEBUG] [2017-09-14 12:51:37,306] [3306] start run sql: show slave status
+[DEBUG] [2017-09-14 12:51:37,306] [3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': '', 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': 0L, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000009', 'Read_Master_Log_Pos': 94837081L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 94837081L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 17237L, 'Last_SQL_Error': '', 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000009', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '', 'Relay_Log_File': 'mysqld-relay-bin.000077', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': 'Slave has read all relay log; waiting for the slave I/O thread to update it', 'Replicate_Do_Table': '', 'Last_Errno': 0L, 'Master_Host': '10.171.160.9', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'Yes', 'Relay_Log_Pos': 285L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 0L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
+[INFO] [2017-09-14 12:51:37,307] [3306] slave repl error fixed success!
 ```
 
 3.结束
