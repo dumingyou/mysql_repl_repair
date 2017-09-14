@@ -140,25 +140,25 @@ class MysqlReplRepairDaemon(Daemon):
 
 def run_mysql_repl_repair(op):
 
-		threadlist = []
-		runseconds = int(op.time) - 1
+	threadlist = []
+	runseconds = int(op.time) - 1
 
-		for socket in op.sockets.split(","):
-			myrepair = MysqlReplRepair(op.user, op.password, socket, op.logdir, op.verbose)
-			threadlist.append(myrepair)
+	for socket in op.sockets.split(","):
+		myrepair = MysqlReplRepair(op.user, op.password, socket, op.logdir, op.verbose)
+		threadlist.append(myrepair)
 
-		for thread in threadlist:
-			thread.start()
+	for thread in threadlist:
+		thread.start()
 
-		while runseconds !=0 :
-			if sigint_up:
-				print "Bye.Bye"
-				break
-			time.sleep(1)
-			runseconds = runseconds -1
+	while runseconds !=0 :
+		if sigint_up:
+			print "Bye.Bye"
+			break
+		time.sleep(1)
+		runseconds = runseconds -1
 
-		for thread in threadlist:
-			thread._Thread__stop()
+	for thread in threadlist:
+		thread._Thread__stop()
 
 class MysqlReplRepair(Thread):
 	"Do MySQL repliaction repair"
@@ -1114,6 +1114,8 @@ def main():
 			run_mysql_repl_repair(op)
 
 	except Exception, e:
+		global sigint_up
+		sigint_up = True
 		print str(e)
 		sys.exit()
 
