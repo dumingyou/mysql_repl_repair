@@ -5,7 +5,7 @@ mysql_repl_repair.py是一款用于修复mysql主从复制错误的python小工�
 
  原理
 ======
-1. 当从库sql apply线程遇到1062错误时，说明slave上已经存在需要insert的数据，并且需要insert的数据上有唯一约束，从而导致插入失败，那么需要按照 唯一约束建们 来删除该事务中相关insert语句(对应WRITE_ROWS_EVENT)。最终构造的sql是
+1. 当从库sql apply线程遇到1062错误时，说明slave上已经存在需要insert的数据，并且需要insert的数据上有唯一约束，从而导致插入失败，那么需要按照 唯一约束键们 来删除该事务中相关insert语句(对应WRITE_ROWS_EVENT)。最终构造的sql是
 ```sql
 delete from table where (pk_col = xxx ) or (uk1_col1 = xxx and uk1_col2=yyy)
 ```
