@@ -294,7 +294,7 @@ class MysqlReplRepair(Thread):
 		sql = ""
 
 		if self.errorno == 1062: #duplicate key error
-			if rowdata["event_type"] in (23,30): #only insert cause 1062 error
+			if rowdata["event_type"] in (23,30,24,31): #only insert & update cause 1062 error
 				tb_unique_cols = self.table_unique_key_info(table_schema,table_name)
 
 				if tb_unique_cols == {}: #no unique key never cause duplicate key error
@@ -304,7 +304,10 @@ class MysqlReplRepair(Thread):
 				for uk_name in tb_unique_cols:
 					tmp_pred = ""
 					for col_name in tb_unique_cols[uk_name]:
-						tmp_pred += "and `%s` = %s " %(col_name, rowdata["data"][col_name])
+						if rowdata["event_type"] in (23,30):
+							tmp_pred += "and `%s` = %s " %(col_name, rowdata["data"][col_name])
+						elif rowdata["event_type"] in (24,31):
+							tmp_pred += "and `%s` = %s " %(col_name, rowdata["data2"][col_name])
 					where_pred +=  "or (" + tmp_pred.lstrip("and") + ") "
 
 				sql = "delete from `%s`.`%s` where %s" %(table_schema,table_name, where_pred.lstrip("or"))
