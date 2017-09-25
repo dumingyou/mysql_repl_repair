@@ -14,9 +14,9 @@ delete from table where (pk_col = xxx ) or (uk1_col1 = xxx and uk1_col2=yyy)
 
 2. 当从库sql apply线程遇到1032错误时，说明slave sql线程在执行update或者delete时找不到对应需要变更的数据，那么需要先写入这条数据才行，因为binlog为row模式时变更语句（对应DELETE_ROWS_EVENT或UPDATE_ROWS_EVENT）中包含变更前数据，因此可以构造出这条数据。最终构造的sql是
 ```sql
-insert ignore into table set a=xxx,b=xxx,c=xxx
+replace into table set a=xxx,b=xxx,c=xxx
 ```
-如果事务中包含多条delete/update语句，那么最终需要执行多次 insert操作，而事务中有insert的话，将忽略
+如果事务中包含多条delete/update语句，那么最终需要执行多次 replace操作，而事务中有insert的话，将忽略
 
  限制
 ======
@@ -79,7 +79,7 @@ sudo python mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql3306.sock
 [INFO] [2017-09-14 12:50:23,853] [3306] START POSITION : 94820032 . STOP POSITION : 94820392 
 [INFO] [2017-09-14 12:50:23,853] [3306] ERROR MESSAGE : Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000009, end_log_pos 94820228
 [INFO] [2017-09-14 12:50:23,853] [3306] start parse relay log to fix this error...
-[INFO] [2017-09-14 12:50:23,856] [3306] try to run this sql to resolve repl error, sql: insert ignore into `dmy2`.`mytest` set `a` = 101,`c` = 121,`b` = 10,`e` = x'746467736467',`d` = 51,`g` = x'6433797a736166',`f` = x'3433357479',`i` = '10:10:10.11',`h` = 10.22200,`k` = from_unixtime(1504613928.710),`j` = '1999-1-1',`m` = '1990',`l` = 555,`o` = 3,`n` = 1,`y` = 10.1999998093,`x` = 101.12
+[INFO] [2017-09-14 12:50:23,856] [3306] try to run this sql to resolve repl error, sql: replace into `dmy2`.`mytest` set `a` = 101,`c` = 121,`b` = 10,`e` = x'746467736467',`d` = 51,`g` = x'6433797a736166',`f` = x'3433357479',`i` = '10:10:10.11',`h` = 10.22200,`k` = from_unixtime(1504613928.710),`j` = '1999-1-1',`m` = '1990',`l` = 555,`o` = 3,`n` = 1,`y` = 10.1999998093,`x` = 101.12
 [INFO] [2017-09-14 12:50:23,962] [3306] slave repl error fixed success!
 [INFO] [2017-09-14 12:50:25,964] [3306] SLAVE IS OK !, SKIP...
 [INFO] [2017-09-14 12:50:27,967] [3306] SLAVE IS OK !, SKIP...
