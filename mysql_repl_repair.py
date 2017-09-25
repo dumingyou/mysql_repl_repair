@@ -313,7 +313,7 @@ class MysqlReplRepair(Thread):
 				for col_name in rowdata["data"]:
 					if rowdata["data"][col_name] is not None:
 						tmp_pred += "`%s` = %s," %(col_name,rowdata["data"][col_name])
-				sql = "insert ignore into `%s`.`%s` set %s" %(table_schema,table_name,tmp_pred.rstrip(","))
+				sql = "replace into `%s`.`%s` set %s" %(table_schema,table_name,tmp_pred.rstrip(","))
 
 		if sql == "":
 			return False
