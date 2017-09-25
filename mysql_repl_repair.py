@@ -223,7 +223,9 @@ class MysqlReplRepair(Thread):
 	def get_relay_dir(self):
 
 		ret = self.execsql("select @@relay_log relay_log")
-		if ret["relay_log"].startswith("/"):
+		if ret["relay_log"] is None:
+			return self.execsql("select @@datadir datadir")["datadir"]
+		elif ret["relay_log"].startswith("/"):
 			return ret["relay_log"][:ret["relay_log"].rindex("/")+1]
 		else:
 			datadir = self.execsql("select @@datadir datadir")["datadir"]
