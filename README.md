@@ -34,7 +34,7 @@ replace into table set a=xxx,b=xxx,c=xxx
 ======
 * 支持5.1 ~ 5.7，
 * 目前只支持ROW格式binlog且为FULL row image格式
-* json，空间数据类型的表造成的复制异常目前版本暂不支持，如有强烈需求，我们将考虑支持一下
+* mysql_repl_repair.py不支持修复json，空间数据类型的表造成的复制异常，但mysql_repl_repair2.py支持，mysql_repl_repair2.py解析mysql5.6之后的时间(支持微妙)字段时有bug，已提交issue给python-mysql-replication项目
 
 USAGE
 ===========
