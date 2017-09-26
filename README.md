@@ -103,7 +103,7 @@ Options:
   
   示例
 ================
-1.授权
+1，授权
 
 a.如果使用的是mysql_repl_repair.py，则授权用户本地权限,如果需要在多实例上同时执行，则每个实例都需要赋权
 ```sql
@@ -114,7 +114,7 @@ b.如果使用的是mysql_repl_repair2.py，需要在主从都授权用户执行
 grant all on *.* to mysql@'192.168.1.5' identified by 'mysql';
 ```
 
-2.执行mysql_repl_repair.py脚本，注意：系统用户需要有读relay log的权限，没有的话用sudo
+2，执行mysql_repl_repair.py脚本，注意：系统用户需要有读relay log的权限，没有的话用sudo
 ```shell
 非debug日志模式：
 sudo python mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql3306.sock
@@ -181,8 +181,34 @@ sudo python mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql3306.sock 
 [DEBUG] [2017-09-14 12:51:37,306] [3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': '', 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': 0L, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000009', 'Read_Master_Log_Pos': 94837081L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 94837081L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 17237L, 'Last_SQL_Error': '', 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000009', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '', 'Relay_Log_File': 'mysqld-relay-bin.000077', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': 'Slave has read all relay log; waiting for the slave I/O thread to update it', 'Replicate_Do_Table': '', 'Last_Errno': 0L, 'Master_Host': '192.168.1.1000', 'Master_Info_File': '/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'Yes', 'Relay_Log_Pos': 285L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 0L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
 [INFO] [2017-09-14 12:51:37,307] [3306] slave repl error fixed success!
 ```
-
-3.结束
+3，执行mysql_repl_repair2.py
+```
+python mysql_repl_repair2.py -u mysql -p mysql -i 192.168.1.111:3306 -v
+[DEBUG] [2017-09-26 21:05:08,073] [10.171.160.89.3306] get file lock on /tmp/mysql_repl_repair.192.168.1.111.3306.lck success
+[DEBUG] [2017-09-26 21:05:08,073] [10.171.160.89.3306] start run sql: show slave status
+[DEBUG] [2017-09-26 21:05:08,074] [10.171.160.89.3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': "Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000011, end_log_pos 20190669", 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': None, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000011', 'Read_Master_Log_Pos': 20191536L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 20190309L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 70376L, 'Last_SQL_Error': "Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000011, end_log_pos 20190669", 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000011', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '170926 21:05:05', 'Relay_Log_File': 'mysqld-relay-bin.000129', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': '', 'Replicate_Do_Table': '', 'Last_Errno': 1032L, 'Master_Host': '192.168.1.112', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'No', 'Relay_Log_Pos': 24320L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 1032L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] ****************************************************************
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306]           REPL ERROR FOUND !!! STRAT REPAIR ERROR...
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] ****************************************************************
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] MASTER HOST: 192.168.1.112, MASTER PORT: 3306
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] MASTERLOG FILE : mysql-bin.000011 
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] START POSITION : 20190309, STOP POSITION : 20190669 
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] ERROR MESSAGE : Could not execute Update_rows event on table dmy2.mytest; Can't find record in 'mytest', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log mysql-bin.000011, end_log_pos 20190669
+[INFO] [2017-09-26 21:05:08,075] [10.171.160.89.3306] start to dump master binlog to fix this error...
+[DEBUG] [2017-09-26 21:05:08,082] [10.171.160.89.3306] event data: {'data': {u'a': 9, u'c': 101, u'b': 1, u'e': u'aasfsd', u'd': 1021, u'g': u'd3yzsaf', u'f': u'435ty', u'i': datetime.timedelta(0, 36610, 11), u'h': Decimal('10.22200'), u'k': datetime.datetime(2017, 9, 26, 21, 3, 14, 165), u'j': datetime.date(1999, 1, 1), u'm': 1990, u'l': 555, u'o': set([u'a', u'b']), u'n': u'a', u'y': 10.010000228881836, u'x': 10.3}, 'table_schema': u'dmy2', 'table_name': u'mytest', 'event_type': 'update', 'data2': {u'a': 9, u'c': 101, u'b': 1, u'e': u'aasfsd', u'd': 102, u'g': u'd3yzsaf', u'f': u'435ty', u'i': datetime.timedelta(0, 36610, 11), u'h': Decimal('10.22200'), u'k': datetime.datetime(2017, 9, 26, 21, 5, 5, 257), u'j': datetime.date(1999, 1, 1), u'm': 1990, u'l': 555, u'o': set([u'a', u'b']), u'n': u'a', u'y': 10.010000228881836, u'x': 10.3}}
+[INFO] [2017-09-26 21:05:08,083] [10.171.160.89.3306] try to run this sql to resolve repl error, sql: replace into `dmy2`.`mytest` set `a` = 9,`c` = 101,`b` = 1,`e` = 'aasfsd',`d` = 1021,`g` = 'd3yzsaf',`f` = '435ty',`i` = '10:10:10.000011',`h` = 10.22200,`k` = '2017-09-26 21:03:14.000165',`j` = '1999-01-01',`m` = 1990,`l` = 555,`o` = "a,b",`n` = 'a',`y` = 10.0100002289,`x` = 10.3
+[DEBUG] [2017-09-26 21:05:08,083] [10.171.160.89.3306] start run sql: replace into `dmy2`.`mytest` set `a` = 9,`c` = 101,`b` = 1,`e` = 'aasfsd',`d` = 1021,`g` = 'd3yzsaf',`f` = '435ty',`i` = '10:10:10.000011',`h` = 10.22200,`k` = '2017-09-26 21:03:14.000165',`j` = '1999-01-01',`m` = 1990,`l` = 555,`o` = "a,b",`n` = 'a',`y` = 10.0100002289,`x` = 10.3
+[DEBUG] [2017-09-26 21:05:08,086] [10.171.160.89.3306] sql result: None
+[DEBUG] [2017-09-26 21:05:08,086] [10.171.160.89.3306] start run sql: stop slave;
+[DEBUG] [2017-09-26 21:05:08,091] [10.171.160.89.3306] sql result: None
+[DEBUG] [2017-09-26 21:05:08,091] [10.171.160.89.3306] start run sql: start slave
+[DEBUG] [2017-09-26 21:05:08,093] [10.171.160.89.3306] sql result: None
+[DEBUG] [2017-09-26 21:05:08,193] [10.171.160.89.3306] start run sql: show slave status
+[DEBUG] [2017-09-26 21:05:08,194] [10.171.160.89.3306] sql result: {'Replicate_Wild_Do_Table': '', 'Retrieved_Gtid_Set': '', 'Master_SSL_CA_Path': '', 'Last_Error': '', 'Until_Log_File': '', 'SQL_Delay': 0L, 'Seconds_Behind_Master': 0L, 'Master_User': 'replicaUser', 'Master_Port': 3306L, 'Master_Retry_Count': 86400L, 'Until_Log_Pos': 0L, 'Master_Log_File': 'mysql-bin.000011', 'Read_Master_Log_Pos': 20191536L, 'Replicate_Do_DB': '', 'Master_SSL_Verify_Server_Cert': 'No', 'Exec_Master_Log_Pos': 20191536L, 'Replicate_Ignore_Server_Ids': '', 'Replicate_Ignore_Table': '', 'Master_Server_Id': 4787L, 'Relay_Log_Space': 25886L, 'Last_SQL_Error': '', 'SQL_Remaining_Delay': None, 'Relay_Master_Log_File': 'mysql-bin.000011', 'Master_SSL_Allowed': 'No', 'Master_SSL_CA_File': '', 'Slave_IO_State': 'Waiting for master to send event', 'Last_SQL_Error_Timestamp': '', 'Relay_Log_File': 'mysqld-relay-bin.000130', 'Replicate_Ignore_DB': '', 'Last_IO_Error': '', 'Until_Condition': 'None', 'Slave_SQL_Running_State': 'Slave has read all relay log; waiting for the slave I/O thread to update it', 'Replicate_Do_Table': '', 'Last_Errno': 0L, 'Master_Host': '192.168.1.112', 'Master_Info_File': '/ebs/mysql_data/master.info', 'Master_SSL_Key': '', 'Executed_Gtid_Set': '', 'Master_Bind': '', 'Skip_Counter': 0L, 'Slave_SQL_Running': 'Yes', 'Relay_Log_Pos': 285L, 'Master_SSL_Cert': '', 'Last_IO_Errno': 0L, 'Slave_IO_Running': 'Yes', 'Connect_Retry': 60L, 'Last_SQL_Errno': 0L, 'Last_IO_Error_Timestamp': '', 'Replicate_Wild_Ignore_Table': '', 'Master_UUID': 'b4dfc344-975c-11e6-addd-fa163e7f8534', 'Auto_Position': 0L, 'Master_SSL_Crl': '', 'Master_SSL_Cipher': '', 'Master_SSL_Crlpath': ''}
+[INFO] [2017-09-26 21:05:08,194] [10.171.160.89.3306] slave repl error fixed success!
+^CBye.Bye
+```
+4，结束
 
 如果不是以daemon方式运行，那么只需要Ctrl+C即可结束，如果是以daemon方式，直接kill进程即可
 
