@@ -11,7 +11,7 @@ mysql_repl_repair2.py可在所有网络通的机器上执行，但依赖python-m
 
 mysql_repl_repair.py 不够便利（只能再从库执行），但安全（不会对主库造成影响， 只需对用户本地授权），无依赖，不支持json geo类型
 
-mysql_repl_repair2.py 便利（中心化管理），但不够安全（需要主、从库对脚本所在机器授权，对主库有额外开销），依赖python-mysql-replication(需要先下载)，支持json，geo类型，但解析mysql5.6之后的时间(支持微妙)字段时有bug，见 https://github.com/noplay/python-mysql-replication/issues/231 mysql_repl_repair.py没有这个问题
+mysql_repl_repair2.py 便利（中心化管理），但不够安全（需要主、从库对脚本所在机器授权，获取主库binlog对主库有额外开销），依赖python-mysql-replication(需要先下载)，支持json，geo类型，但解析mysql5.6之后的时间(支持微妙)字段时有bug，见 https://github.com/noplay/python-mysql-replication/issues/231 mysql_repl_repair.py没有这个问题
 
 目前网易内部的使用方法：监控服务定期监控mysql主从复制状态，如遇1062,1032 则执行mysql_repl_repair.py进行自动修复
 
