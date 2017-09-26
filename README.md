@@ -1,16 +1,24 @@
 # mysql_repl_repair
-mysql_repl_repair.py是一款用于修复mysql主从复制错误的python小工具，该工具可以修复由于主从数据不一致导致的1062(duplicate key), 1032(key not found)错误。当遇到复制出错，mysql_repl_repair.py会流式读取relay log中的数据，并构造成修复sql，在从库上执行，解决sql线程apply时遇到的问题。mysql_repl_repair.py非常轻巧，即使在遇到大事务时也不会对服务器造成性能影响，mysql_repl_repair.py支持以daemon方式后台运行，支持单机多实例下同时修复多个实例
+mysql_repl_repair是用于修复mysql主从复制错误的python工具，该工具可以修复由于主从数据不一致导致的1062(duplicate key), 1032(key not found)错误。
+这里有2个文件 mysql_repl_repair.py 与 mysql_repl_repair2.py, 这两个文件都可以解决复制问题，但他们的用法不一样，你可以根据你的实际实际情况来选择使用方式
+他们的主要区别在：
+mysql_repl_repair.py 必须slave本地执行，靠读取relay log中的数据来构造修复复制所需sql
+mysql_repl_repair2.py可在所有网络通的机器上执行，但依赖python-mysql-replication工具(该工具可以模拟从库获取master上的binlog)，通过python-mysql-replication得到的binlog后即可构造修复复制所需的sql
 
-目前网易内部的使用方法：监控服务定期监控mysql主从复制状态，如遇1062,1032 则执行mysql_repl_repair.py进行修复
+对比来说：
+mysql_repl_repair.py 不够便利（只能再从库执行），但安全（不会对主库造成影响， 只需对用户本地授权），不支持json geo类型
+mysql_repl_repair2.py 便利（中心化管理），但不够安全（需要主、从库对脚本所在机器授权，对主库有额外开销），支持json，geo类型，但解析mysql5.6之后的时间(支持微妙)字段时有bug，见 https://github.com/noplay/python-mysql-replication/issues/231 mysql_repl_repair.py没有这个问题
+
+目前网易内部的使用方法：监控服务定期监控mysql主从复制状态，如遇1062,1032 则执行mysql_repl_repair.py进行自动修复
 
  原理
 ======
-1. 当从库sql apply线程遇到1062错误时，说明slave上已经存在需要insert的数据，并且需要insert的数据上有唯一约束，从而导致插入失败，那么需要按照 唯一约束键们 来删除该事务中相关insert语句(对应WRITE_ROWS_EVENT)。最终构造的sql是
+1. 当从库sql apply线程遇到1062错误(唯一键冲突)时，说明主库上的操作在从库上遇到唯一冲突，这个操作可能是insert或者update，那么需要按照 唯一约束键们(可能多个唯一约束) 来删除从库上的数据，如果是insert导致的1062错误，那么解析WRITE_ROWS_EVENT来构造delete语句, 而如果是update导致的1062错误，则需要从这个UPDATE_ROWS_EVENT获取记录的后镜像(update后的数据)，通过后镜像来构造delete语句。最终构造的sql是
 ```sql
 delete from table where (pk_col = xxx ) or (uk1_col1 = xxx and uk1_col2=yyy)
 ```
 
-如果事务中存在多条insert， 那么对应多条delete语句，而事务中有delete或者update的话，将忽略
+如果事务中存在多条insert或者update语句， 那么将构造多条delete语句，而事务中有delete的话，将忽略
 
 2. 当从库sql apply线程遇到1032错误时，说明slave sql线程在执行update或者delete时找不到对应需要变更的数据，那么需要先写入这条数据才行，因为binlog为row模式时变更语句（对应DELETE_ROWS_EVENT或UPDATE_ROWS_EVENT）中包含变更前数据，因此可以构造出这条数据。最终构造的sql是
 ```sql
@@ -55,16 +63,52 @@ Options:
   -d, --daemon          run as a daemon
   -t TIME, --time=TIME  unit is second, default is 0 mean run forever
   -v, --verbose         debug log mode
+  
+  
+python mysql_repl_repair2.py -h
+Usage: 
+python mysql_repl_repair2.py [options]
+
+this script is used to repair mysql replication errors(1062, 1032)
+
+example:
+python mysql_repl_repair2.py -i 192.168.1.1:3306  -u mysql -p mysql -v
+python mysql_repl_repair2.py -i 192.168.1.1:3306,192.168.1.2:3306 -u mysql -p mysql -d -l tmp
+
+
+Options:
+  -h, --help            show this help message and exit
+  -u USER, --user=USER  username for login mysql instance and its master
+  -p PASSWORD, --password=PASSWORD
+                        Password to use when connecting to mysql instance and
+                        its master
+  -l LOGDIR, --logdir=LOGDIR
+                        log will output to screen by default,if run with
+                        daemon mode, default logdir is /tmp, logfile is
+                        $logdir/mysql_repl_repair.$port.log
+  -i INSTANCES, --instances=INSTANCES
+                        mysql instances which need repair, separate by ','. it
+                        will repair all instances store in config file if this
+                        option not set
+  -d, --daemon          run as a daemon
+  -t TIME, --time=TIME  unit is second, default is 0 mean run forever
+  -v, --verbose         debug log mode
   ```
  
   
   示例
 ================
-1.授权本地用户权限,如果需要在多实例上同时执行，则每个实例都需要赋权
+1.授权
+a.如果使用的是mysql_repl_repair.py，则授权用户本地权限,如果需要在多实例上同时执行，则每个实例都需要赋权
 ```sql
 grant all on *.* to mysql@'localhost' identified by 'mysql';
 ```
-2.执行脚本，注意：系统用户需要有读relay log的权限，没有的话用sudo
+b.如果使用的是mysql_repl_repair2.py，需要在主从都授权用户执行机器权限,比如 我再 192.168.1.5 上执行脚本修复 192.168.1.7:3306 192.168.1.8:3306复制错误，那么我需要在192.168.1.7:3306 192.168.1.8:3306及其主库上授权
+```
+grant all on *.* to mysql@'192.168.1.5' identified by 'mysql';
+```
+
+2.执行mysql_repl_repair.py脚本，注意：系统用户需要有读relay log的权限，没有的话用sudo
 ```shell
 非debug日志模式：
 sudo python mysql_repl_repair.py -u mysql -p mysql --socket=/tmp/mysql3306.sock
