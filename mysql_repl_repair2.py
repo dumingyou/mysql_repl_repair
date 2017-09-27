@@ -297,7 +297,6 @@ class MysqlReplRepair(Thread):
 	def handle_error(self,rowdata,binlog_pos):
 		"handle 1062 & 1032 error with row event result data"
 
-		print rowdata,binlog_pos
 		table_schema = rowdata["table_schema"]
 		table_name = rowdata["table_name"]
 		sql = ""
@@ -378,6 +377,7 @@ class MysqlReplRepair(Thread):
 			if self.errorno in (1032, 1062):
 				#master info
 				master_host,master_port = slaveinfo["Master_Host"],int(slaveinfo["Master_Port"])
+
 				master_dbconn = self.dbconn(master_host,int(master_port))
 				master_cursor = master_dbconn.cursor()
 				
@@ -396,10 +396,11 @@ class MysqlReplRepair(Thread):
 				self.logger.info(" "*10 + "REPL ERROR FOUND !!! STRAT REPAIR ERROR...")
 				self.logger.info("*"*64)
 
+				self.logger.info("MASTER HOST: %s, MASTER PORT: %s" %(master_host,master_port))
 				self.logger.info("MASTERLOG FILE : %s " % (master_log_file))
-				self.logger.info("START POSITION : %s . STOP POSITION : %s " % (self.start_position, self.stop_position))
+				self.logger.info("START POSITION : %s, STOP POSITION : %s " % (self.start_position, self.stop_position))
 				self.logger.info("ERROR MESSAGE : %s" % (last_sql_error))
-				self.logger.info("start parse relay log to fix this error...")
+				self.logger.info("start to dump master binlog to fix this error...")
 
 				stream = BinLogStreamReader(connection_settings={"host": master_host,"port": master_port,"user": self.user,"passwd": self.password},
 							server_id=256256256,
@@ -411,7 +412,6 @@ class MysqlReplRepair(Thread):
 						)
 
 				for binlogevent in stream:
-					print stream.log_pos
 					if stream.log_pos > self.stop_position and stream.log_file == master_log_file:
 						break
 					else:
@@ -429,6 +429,7 @@ class MysqlReplRepair(Thread):
 								event_info["event_type"] = "delete"
 								event_info["data"] = row["values"]
 
+							self.logger.debug("event data: " + str(event_info))
 							res = self.handle_error(event_info, stream.log_pos)
 							if res:
 								break
@@ -489,7 +490,6 @@ def main():
 	"main func"
 
 	op = usage()
-	print op
 	signal.signal(signal.SIGINT, sigint_handler)
 
 	try:
