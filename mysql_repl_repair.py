@@ -21,7 +21,7 @@ def usage():
 	usage += "this script is used to repair mysql replication errors(1062, 1032)\n"
 	usage += "\n"
 	usage += "example:\n"
-	usage += "python mysql_repl_repair.py -u mysql -p mysql -S /tmp/mysql.sock  -d -v\n"
+	usage += "python mysql_repl_repair.py -u mysql -p mysql -S /tmp/mysql3306.sock  -d -v\n"
 	usage += "python mysql_repl_repair.py -u mysql -p mysql -S /tmp/mysql3306.sock,"\
 			 "/tmp/mysql3307.sock -l /tmp\n"
 
@@ -763,21 +763,7 @@ class BinlogReader():
 			if value == 0:  # nasty mysql 0000-00-00 dates
 				return None
 
-			date = value / 1000000
-			time = int(value % 1000000)
-
-			year = int(date / 10000)
-			month = int((date % 10000) / 100)
-			day = int(date % 100)
-			if year == 0 or month == 0 or day == 0:
-				return None
-
-			hour = int(time / 10000)
-			minute = int(time % 1000000)
-			second = int(time % 100)
-
-			return str(year) + "-" + str(month) + "-" + str(day) \
-				   + " " + str(hour) + ":" + str(minute) + ":" + str(second)
+			return str(value)[:8] + ' ' + str(value)[8:]
 
 	def __read_timestamp(self,column):
 		"timestamp support microsecond since mysql 5.6"
