@@ -220,7 +220,7 @@ slave_exec_mode为IDEMPOTENT时，从库slave的表现是遇到insert出错时re
 
 2.这个工具支持远程执行吗？
 
-支持，请选择使用 mysql_repl_repair.py
+支持，请选择使用 mysql_repl_repair2.py
 
 3.这个工具支持mysql5.7的GTID吗？
 
