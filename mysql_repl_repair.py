@@ -21,7 +21,7 @@ def usage():
 	usage += "this script is used to repair mysql replication errors(1062, 1032)\n"
 	usage += "\n"
 	usage += "example:\n"
-	usage += "python mysql_repl_repair.py -u mysql -p mysql -S /tmp/mysql3306.sock  -d -v\n"
+	usage += "python mysql_repl_repair.py -u mysql -p mysql -S /tmp/mysql.sock  -d -v\n"
 	usage += "python mysql_repl_repair.py -u mysql -p mysql -S /tmp/mysql3306.sock,"\
 			 "/tmp/mysql3307.sock -l /tmp\n"
 
@@ -639,6 +639,7 @@ class BinlogReader():
 			res = "-"
 
 		firstbuf = struct.pack('B', value ^ 0x80)
+		firstbuf_len = 1
 
 		size = compressed_bytes[comp_integral]
 		if size > 0:
@@ -646,22 +647,34 @@ class BinlogReader():
 			lastbuf = self.read(size-1)
 			paddbuf = (4 - size)*'\x00'
 			value = struct.unpack('>i', paddbuf + firstbuf+lastbuf)[0] ^ mask
+			firstbuf_len = 0
 
 			res += str(value)
 
 		for i in range(0, uncomp_integral):
-			value = struct.unpack('>i', self.read(4))[0] ^ mask
+			if firstbuf_len > 0:
+				value = struct.unpack('>i', firstbuf + self.read(4-firstbuf_len))[0] ^ mask
+				firstbuf_len = 0
+			else:
+				value = struct.unpack('>i', self.read(4))[0] ^ mask
 			res += '%09d' % value
 
 		res += "."
 
 		for i in range(0, uncomp_fractional):
-			value = struct.unpack('>i', self.read(4))[0] ^ mask
+			if firstbuf_len > 0:
+				value = struct.unpack('>i', firstbuf + self.read(4-firstbuf_len))[0] ^ mask
+				firstbuf_len = 0
+			else:
+				value = struct.unpack('>i', self.read(4))[0] ^ mask
 			res += '%09d' % value
 
 		size = compressed_bytes[comp_fractional]
 		if size > 0:
-			value = self.read_int_be_by_size(size) ^ mask
+			if firstbuf_len > 0:
+				value = struct.unpack('<i', (4-size)*'\x00' + firstbuf + self.read(size-firstbuf_len))[0] ^ mask
+			else:
+				value = self.read_int_be_by_size(size) ^ mask
 			res += '%0*d' % (int(comp_fractional), value)
 
 		return decimal.Decimal(res)
@@ -705,7 +718,7 @@ class BinlogReader():
 				microsecond = int(microsecond / 10)
 			return res % microsecond
 
-		return '0'
+		return 0
 
 	def __read_time(self,column):
 		"time support microsecond since mysql 5.6"
@@ -924,7 +937,6 @@ class BinlogReader():
 			elif column["DATA_TYPE"] == "bit":
 				length = int(column["COLUMN_TYPE"].split('(')[1][:-1])
 				size = (length+7)/8
-				print length,size
 				values[name] = "b'" + self.__read_bit(size,length) + "'"
 
 			#todo support GEOMETRY & JSON
