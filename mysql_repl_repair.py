@@ -718,7 +718,7 @@ class BinlogReader():
 				microsecond = int(microsecond / 10)
 			return res % microsecond
 
-		return 0
+		return '0'
 
 	def __read_time(self,column):
 		"time support microsecond since mysql 5.6"
