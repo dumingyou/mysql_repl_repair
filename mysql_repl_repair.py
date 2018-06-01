@@ -272,15 +272,23 @@ class MysqlReplRepair(Thread):
 	def fix_slave_by_sql(self,sql):
 		"run sql and restart slave"
 
+		global sigint_up
+
 		self.logger.info("try to run this sql to resolve repl error, sql: " +sql)
-		self.execsql(sql)
+		try:
+			self.execsql(sql)
+		except Exception, e:
+			self.logger.error("run sql failed, sql: " + sql)
+			sigint_up = True
+
 		self.execsql("stop slave;")
 		self.execsql("start slave")
 		time.sleep(0.1)
 		slaveinfo = self.execsql("show slave status")
 
-		if slaveinfo["Seconds_Behind_Master"] is not None:
+		if slaveinfo["Seconds_Behind_Master"] is not None and slaveinfo["Slave_SQL_Running"] == "Yes":
 			self.logger.info("slave repl error fixed success!")
+			self.change_repl_worker_count(1)
 			return True
 		else:
 			self.logger.info("slave repl error fixed failed! go on...")
@@ -329,6 +337,23 @@ class MysqlReplRepair(Thread):
 			else:
 				return self.fix_slave_by_sql(sql)
 				
+	def change_repl_worker_count(self,type):
+		"set slave slave_parallel_workers to 0 or to multi"
+
+		ret = self.execsql("select * from information_schema.global_variables where VARIABLE_NAME='slave_parallel_workers'")
+
+		if ret is None:
+			return
+
+		if type == 0:
+			self.execsql("select ifnull(@slave_workers, @slave_workers:=@@slave_parallel_workers)")
+			self.execsql("set global slave_parallel_workers=0")
+		else:
+			self.execsql("set global slave_parallel_workers=@slave_workers")
+
+		self.execsql("stop slave")
+		self.execsql("start slave")
+		time.sleep(0.1)
 
 
 	def run(self):
@@ -366,11 +391,15 @@ class MysqlReplRepair(Thread):
 				time.sleep(2)
 				continue
 
-			if slaveinfo["Seconds_Behind_Master"] is not None:
+			if slaveinfo["Seconds_Behind_Master"] is not None and slaveinfo["Slave_SQL_Running"] == "Yes":
 				self.logger.info("SLAVE IS OK !, SKIP...")
 
 			self.errorno = int(slaveinfo['Last_SQL_Errno'])
-			if self.errorno in (1032, 1062):
+			if self.errorno in (1032, 1062) and slaveinfo["Last_SQL_Error"] !="":
+
+				#change slave repl work to 0
+				self.change_repl_worker_count(0)
+				slaveinfo = self.execsql("show slave status")
 
 				binlogfile = relaydir + slaveinfo["Relay_Log_File"]
 
@@ -379,6 +408,7 @@ class MysqlReplRepair(Thread):
 				relay_log_pos = int(slaveinfo["Relay_Log_Pos"])
 				exec_master_log_pos = int(slaveinfo["Exec_Master_Log_Pos"])
 
+				print last_sql_error.split('end_log_pos')
 				end_log_pos = int(last_sql_error.split('end_log_pos')[1].split('.')[0])
 
 				self.stop_position = relay_log_pos + (end_log_pos - exec_master_log_pos)
@@ -487,7 +517,7 @@ class BinlogReader():
 		return self.stream.read(size)
 
 	def is_binlogfile(self):
-		"binlog magic number： \xfe\x62\x69\x6e"
+		"binlog magic numberï¼š \xfe\x62\x69\x6e"
 		magicnum = self.read(4)
 		if magicnum != "\xfe\x62\x69\x6e":
 			raise Exception("this is not a binlog file")
