@@ -287,8 +287,9 @@ class MysqlReplRepair(Thread):
 		time.sleep(0.1)
 		slaveinfo = self.execsql("show slave status")
 
-		if slaveinfo["Seconds_Behind_Master"] is not None:
+		if slaveinfo["Seconds_Behind_Master"] is not None and slaveinfo["Slave_SQL_Running"] == "Yes":
 			self.logger.info("slave repl error fixed success!")
+			self.change_repl_worker_count(1)
 			return True
 		else:
 			self.logger.info("slave repl error fixed failed! go on...")
@@ -340,6 +341,23 @@ class MysqlReplRepair(Thread):
 			else:
 				return self.fix_slave_by_sql(sql)
 				
+	def change_repl_worker_count(self,type):
+		"set slave slave_parallel_workers to 0 or to multi"
+
+		ret = self.execsql("select * from information_schema.global_variables where VARIABLE_NAME='slave_parallel_workers'")
+
+		if ret is None:
+			return
+
+		if type == 0:
+			self.execsql("select ifnull(@slave_workers, @slave_workers:=@@slave_parallel_workers)")
+			self.execsql("set global slave_parallel_workers=0")
+		else:
+			self.execsql("set global slave_parallel_workers=@slave_workers")
+
+		self.execsql("stop slave")
+		self.execsql("start slave")
+		time.sleep(0.1)
 
 
 	def run(self):
@@ -374,8 +392,14 @@ class MysqlReplRepair(Thread):
 				self.logger.info("SLAVE IS OK !, SKIP...")
 
 			self.errorno = int(slaveinfo['Last_SQL_Errno'])
-			if self.errorno in (1032, 1062):
-				#master info
+
+			if self.errorno in (1032, 1062) and slaveinfo["Last_SQL_Error"] !="":
+
+				#change slave repl work to 0
+				self.change_repl_worker_count(0)
+				slaveinfo = self.execsql("show slave status")
+
+				#master info 
 				master_host,master_port = slaveinfo["Master_Host"],int(slaveinfo["Master_Port"])
 
 				master_dbconn = self.dbconn(master_host,int(master_port))
