@@ -146,7 +146,7 @@ def run_mysql_repl_repair(op):
     runseconds = int(op.time) - 1
 
     for socket in op.sockets.split(","):
-        myrepair = MysqlReplRepair(op.user, op.password, socket, op.logdir, op.verbose)
+        myrepair = MysqlReplRepair(op.user, op.password, socket, op.logdir, op.verbose, op.channel)
         threadlist.append(myrepair)
 
     for thread in threadlist:

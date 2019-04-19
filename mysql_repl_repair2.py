@@ -162,7 +162,7 @@ def run_mysql_repl_repair(op):
 
     for instance in op.instances.split(","):
         ip,port = instance.split(":")
-        myrepair = MysqlReplRepair(op.user, op.password, ip, port, op.logdir, op.verbose)
+        myrepair = MysqlReplRepair(op.user, op.password, ip, port, op.logdir, op.verbose, op.channel)
         threadlist.append(myrepair)
 
     for thread in threadlist:
@@ -181,7 +181,7 @@ def run_mysql_repl_repair(op):
 class MysqlReplRepair(Thread):
     "Do MySQL repliaction repair"
 
-    def __init__(self,user,password,ip,port,logdir,isdebug):
+    def __init__(self,user,password,ip,port,logdir,isdebug, channel):
         Thread.__init__(self)
 
         self.user = user
@@ -194,6 +194,7 @@ class MysqlReplRepair(Thread):
         self.dbcursor = self.dbconn(self.ip, self.port).cursor()
         self.lockfile = "/tmp/mysql_repl_repair." + ip + "." + port + ".lck"
         self.logger = MyLogger(self.ip+"."+self.port, self.logdir, self.isdebug)
+        self.channel = channel
 
     def dbconn(self,ip,port):
         "db connection fun, return a db cursor"
