@@ -180,8 +180,10 @@ class MysqlReplRepair(Thread):
 
         self.start_position = 0
         self.stop_position = 0
-
-        self.lockfile = "/tmp/mysql_repl_repair" + str(self.port) + ".lck"
+        if channel is None:
+            self.lockfile = "/tmp/mysql_repl_repair" + str(self.port) + ".lck"
+        else:
+            self.lockfile = "/tmp/mysql_repl_repair" + str(self.port) + channel.strip() + ".lck"
 
         self.logger = MyLogger(self.port, self.logdir, self.isdebug)
 
