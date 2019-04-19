@@ -183,7 +183,7 @@ class MysqlReplRepair(Thread):
         if channel is None:
             self.lockfile = "/tmp/mysql_repl_repair" + str(self.port) + ".lck"
         else:
-            self.lockfile = "/tmp/mysql_repl_repair" + str(self.port) + channel.strip() + ".lck"
+            self.lockfile = "/tmp/mysql_repl_repair" + str(self.port) + "_" + channel.strip() + ".lck"
 
         self.logger = MyLogger(self.port, self.logdir, self.isdebug)
 
