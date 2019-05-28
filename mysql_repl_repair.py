@@ -165,7 +165,7 @@ def run_mysql_repl_repair(op):
 class MysqlReplRepair(Thread):
     "Do MySQL repliaction repair"
 
-    def __init__(self,user,password,socket,logdir,isdebug, channel):
+    def __init__(self, user, password, socket, logdir, isdebug, channel):
         Thread.__init__(self)
 
         self.user = user
@@ -196,7 +196,7 @@ class MysqlReplRepair(Thread):
         "init db connection, return a db cursor"
 
         try:
-            conn = MySQLdb.connect(user=self.user, passwd=self.password,unix_socket=self.socket,
+            conn = MySQLdb.connect(user=self.user, passwd=self.password, unix_socket=self.socket,
                     db='mysql',cursorclass=MySQLdb.cursors.DictCursor)
             conn.autocommit(True)
 
@@ -316,7 +316,7 @@ class MysqlReplRepair(Thread):
 
         if self.errorno == 1062: #duplicate key error
             if rowdata["event_type"] in (23,30,24,31): #only insert & update cause 1062 error
-                tb_unique_cols = self.table_unique_key_info(table_schema,table_name)
+                tb_unique_cols = self.table_unique_key_info(table_schema, table_name)
 
                 if tb_unique_cols == {}: #no unique key never cause duplicate key error
                     return False
@@ -331,7 +331,7 @@ class MysqlReplRepair(Thread):
                             tmp_pred += "and `%s` = %s " %(col_name, rowdata["data2"][col_name])
                     where_pred +=  "or (" + tmp_pred.lstrip("and") + ") "
 
-                sql = "delete from `%s`.`%s` where %s" %(table_schema,table_name, where_pred.lstrip("or"))
+                sql = "delete from `%s`.`%s` where %s" %(table_schema, table_name, where_pred.lstrip("or"))
 
         elif self.errorno == 1032: #record not found,update,delete
             if rowdata["event_type"] in (24, 25, 31, 32):  # only update & delete cause 1032 error
@@ -339,7 +339,7 @@ class MysqlReplRepair(Thread):
                 for col_name in rowdata["data"]:
                     if rowdata["data"][col_name] is not None:
                         tmp_pred += "`%s` = %s," %(col_name,rowdata["data"][col_name])
-                sql = "replace into `%s`.`%s` set %s" %(table_schema,table_name,tmp_pred.rstrip(","))
+                sql = "replace into `%s`.`%s` set %s" %(table_schema, table_name, tmp_pred.rstrip(","))
 
         if sql == "":
             return False
@@ -353,7 +353,9 @@ class MysqlReplRepair(Thread):
     def change_repl_worker_count(self,type):
         "set slave slave_parallel_workers to 0 or to multi"
 
-        ret = self.execsql("select * from information_schema.global_variables where VARIABLE_NAME='slave_parallel_workers'")
+        # ERROR 3167 (HY000): The 'INFORMATION_SCHEMA.GLOBAL_VARIABLES' feature is disabled; see the documentation for 'show_compatibility_56'
+        # ret = self.execsql("select * from information_schema.global_variables where VARIABLE_NAME='slave_parallel_workers'")
+        ret = self.execsql("show variables like 'slave_parallel_workers'")
 
         if ret is None:
             return

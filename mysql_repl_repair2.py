@@ -361,7 +361,9 @@ class MysqlReplRepair(Thread):
     def change_repl_worker_count(self,type):
         "set slave slave_parallel_workers to 0 or to multi"
 
-        ret = self.execsql("select * from information_schema.global_variables where VARIABLE_NAME='slave_parallel_workers'")
+        # ERROR 3167 (HY000): The 'INFORMATION_SCHEMA.GLOBAL_VARIABLES' feature is disabled; see the documentation for 'show_compatibility_56'
+        # ret = self.execsql("select * from information_schema.global_variables where VARIABLE_NAME='slave_parallel_workers'")
+        ret = self.execsql("show variables like 'slave_parallel_workers'")
 
         if ret is None:
             return
